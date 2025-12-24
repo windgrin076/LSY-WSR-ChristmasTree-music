@@ -603,6 +603,7 @@ const iconPlaying = document.getElementById('icon-playing');
 let isToggling = false;
 
 if (btnSound && bgMusic) {
+    // 1. Setup Click Listener for Toggle
     btnSound.addEventListener('click', async () => {
         if (isToggling) return;
         isToggling = true;
@@ -618,9 +619,25 @@ if (btnSound && bgMusic) {
                 iconMuted.style.display = 'block';
             }
         } catch (err) {
-            console.error("Audio playback failed. Please ensure 'assets/1.mp3' exists.", err);
+            console.error("Audio toggle failed.", err);
         } finally {
             isToggling = false;
         }
     });
+
+    // 2. Check Autoplay Status on Load
+    // Since we set autoplay in HTML, the browser might have blocked it.
+    // If it is paused (blocked), we revert the UI to Muted state.
+    // We give it a small delay to allow the 'play' promise to process.
+    setTimeout(() => {
+        if (bgMusic.paused) {
+            console.log("Autoplay was blocked by browser. User interaction required.");
+            iconPlaying.style.display = 'none';
+            iconMuted.style.display = 'block';
+        } else {
+            // Autoplay successful
+            iconPlaying.style.display = 'block';
+            iconMuted.style.display = 'none';
+        }
+    }, 500);
 }
